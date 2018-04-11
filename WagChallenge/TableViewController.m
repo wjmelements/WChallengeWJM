@@ -1,12 +1,16 @@
 #import "TableViewController.h"
 
 #import "StackExchange.h"
+#import "UserCell.h"
+
+static NSString *const kUserCellReuseIdentifier = @"user";
 
 @interface TableViewController () <UITableViewDataSource, StackExchangeDelegate>
 @end
 
 @implementation TableViewController {
     UITableView *_tableView;
+    NSMutableArray *_items;
 }
 
 - (instancetype)init {
@@ -14,7 +18,8 @@
     if (!self) {
         return self;
     }
-    fetchStackExchange(self);
+    fetchStackExchange(self, 1);
+    _items = [NSMutableArray array];
     return self;
 }
 
@@ -22,13 +27,27 @@
     _tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
     _tableView.backgroundColor = UIColor.redColor;
     _tableView.dataSource = self;
+    [_tableView
+        registerClass:[UserCell class]
+        forCellReuseIdentifier:kUserCellReuseIdentifier 
+    ];
     [self.view addSubview:_tableView];
 }
 
 #pragma mark - UITableViewDataSource
 - (UITableViewCell *)tableView:(UITableView *)tableView
     cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return nil;
+    NSUInteger row = indexPath.row;
+    NSDictionary *item = _items[row];
+    UserCell *cell = [_tableView dequeueReusableCellWithIdentifier:kUserCellReuseIdentifier];
+    if (!cell) {
+        cell = [[UserCell alloc]
+            initWithStyle:UITableViewCellStyleDefault
+            reuseIdentifier:kUserCellReuseIdentifier
+        ];
+    }
+    [cell setData:item];
+    return cell;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -37,13 +56,15 @@
 
 - (NSInteger)tableView:(UITableView *)tableView
     numberOfRowsInSection:(NSInteger)section {
-    return 0;
+    return _items.count;
 }
 
 #pragma mark - StackExchangeDelegate
 
-- (void)onStackExchangeResult:(NSDictionary *)result {
-    NSLog(@"%@", result);
+- (void)onStackExchangeResult:(NSArray *)results page:(NSUInteger)page {
+    [_items addObjectsFromArray:results];
+    [_tableView reloadData];// TODO optimize
+    //fetchStackExchange(self, page+1);
 }
 
 @end

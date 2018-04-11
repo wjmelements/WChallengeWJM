@@ -1,7 +1,7 @@
 @import UIKit;
 
 @protocol StackExchangeDelegate
-- (void)onStackExchangeResult:(NSDictionary *)result;
+- (void)onStackExchangeResult:(NSArray *)result page:(NSUInteger)page;
 @end
 
-void fetchStackExchange(id<StackExchangeDelegate> delegate);
+void fetchStackExchange(__weak id<StackExchangeDelegate> delegate, NSUInteger page);

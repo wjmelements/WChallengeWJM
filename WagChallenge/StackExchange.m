@@ -8,17 +8,19 @@ static inline void ensureQueue() {
     }
 }
 
-void fetchStackExchange(id<StackExchangeDelegate> delegate) {
+void fetchStackExchange(__weak id<StackExchangeDelegate> delegate, NSUInteger page) {
     ensureQueue();
     dispatch_async(stackExchangeQueue, ^{
-        NSData *result = [NSData dataWithContentsOfURL:[NSURL URLWithString:@"https://api.stackexchange.com/2.2/users?site=stackoverflow"]];       
+        NSData *result = [NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.stackexchange.com/2.2/users?site=stackoverflow&page=%lu", page]]];       
         NSDictionary *parsedResult = [NSJSONSerialization
             JSONObjectWithData:result
             options:kNilOptions
             error:nil
         ];
+        NSArray *items = parsedResult[@"items"];
+        NSLog(@"%@", items);
         dispatch_async(dispatch_get_main_queue(), ^{
-            [delegate onStackExchangeResult:parsedResult];
+            [delegate onStackExchangeResult:items page:page];
         });
     });
 }
