@@ -8,6 +8,7 @@
 - (void)setData:(NSDictionary *)data {
     NSLog(@"%@", data);
     // TODO
+    self.textLabel.text = data[@"display_name"];
 }
 
 - (void)prepareForReuse {
