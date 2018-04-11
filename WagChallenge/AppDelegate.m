@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 
+#import "TableViewController.h"
+
 @interface AppDelegate ()
 @end
 
@@ -18,7 +20,7 @@
         initWithFrame:[[UIScreen mainScreen] bounds]
     ];
     self.window.backgroundColor = [UIColor lightGrayColor];
-    self.window.rootViewController = [[UIViewController alloc] init];
+    self.window.rootViewController = [[TableViewController alloc] init];
     [self.window makeKeyAndVisible];
     return YES;
 }
