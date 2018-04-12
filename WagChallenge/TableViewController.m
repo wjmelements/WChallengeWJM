@@ -25,7 +25,6 @@ static NSString *const kUserCellReuseIdentifier = @"user";
 
 - (void)viewDidLoad {
     _tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
-    _tableView.backgroundColor = UIColor.redColor;
     _tableView.dataSource = self;
     [_tableView
         registerClass:[UserCell class]
