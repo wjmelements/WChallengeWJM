@@ -52,7 +52,7 @@ static CGFloat kLabelPadding = 7.0f;
     CGRect bounds = self.contentView.bounds;
     CGFloat height = CGRectGetHeight(bounds);
     _gold.layer.cornerRadius = _silver.layer.cornerRadius = _bronze.layer.cornerRadius = height / 2;
-    _gold.font = _silver.font = _bronze.font = [_gold.font fontWithSize:height / 5];
+    _gold.font = _silver.font = _bronze.font = [_gold.font fontWithSize:height / 4];
     CGFloat width = CGRectGetWidth(bounds);
     CGRect leftFrame = CGRectMake(0, 0, height, height);
     if (_loadingView) {
