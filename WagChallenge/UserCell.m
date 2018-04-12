@@ -67,32 +67,38 @@ static CGFloat kLabelPadding = 7.0f;
     self.textLabel.frame = CGRectMake(labelLeft, 0, right - labelLeft, height);
 }
 
-- (void)loadImage:(NSString *)remoteURL hash:(NSString *)hash {
-    NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *cachedFile = [cacheDir stringByAppendingPathComponent:hash];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:cachedFile]) {
-        NSLog(@"Cached %@", remoteURL);
-        UIImage *image = [UIImage imageWithContentsOfFile:cachedFile];
+- (void)imageDidLoad:(UIImage *)image hash:(NSString *)hash {
+    if ([hash isEqualToString:self->_imageHash]) {
+        [self hideLoadingView];
         self.imageView.image = image;
     } else {
-        [self showLoadingView];
-        dispatch_async(networkQueue, ^{
+        NSLog(@"Hash has changed:%@ -> %@", hash, self->_imageHash);
+    }
+
+}
+
+- (void)loadImage:(NSString *)remoteURL hash:(NSString *)hash {
+    [self showLoadingView];
+    dispatch_async(networkQueue, ^{
+        NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+        NSString *cachedFile = [cacheDir stringByAppendingPathComponent:hash];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        if ([fileManager fileExistsAtPath:cachedFile]) {
+            NSLog(@"Cached %@", remoteURL);
+            UIImage *image = [UIImage imageWithContentsOfFile:cachedFile];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self imageDidLoad:image hash:hash];
+            });
+        } else {
             NSLog(@"Fetching %@", remoteURL);
             NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:remoteURL]];
             UIImage *image = [UIImage imageWithData:data];
             dispatch_async(dispatch_get_main_queue(), ^{
-                if ([hash isEqualToString:self->_imageHash]) {
-                    [self hideLoadingView];
-                    self.imageView.image = image;
-                    //[self layoutSubviews];
-                } else {
-                    NSLog(@"Hash has changed:%@ -> %@", hash, self->_imageHash);
-                }
+                [self imageDidLoad:image hash:hash];
             });
             [data writeToFile:cachedFile atomically:NO];
-        });
-    }
+        }
+    });
 }
 
 - (void)setData:(NSDictionary *)data {
