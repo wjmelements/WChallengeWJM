@@ -29,6 +29,7 @@ static CGFloat kLabelPadding = 7.0f;
     _bronze.backgroundColor = [Color bronze];
     _silver.backgroundColor = [Color silver];
     _gold.backgroundColor = [Color gold];
+    self.selectionStyle = UITableViewCellSelectionStyleNone;
     return self;
 }
 
