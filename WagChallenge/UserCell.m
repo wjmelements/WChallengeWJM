@@ -70,7 +70,7 @@ static CGFloat kLabelPadding = 7.0f;
 
 - (void)imageDidLoad:(UIImage *)image hash:(NSString *)hash {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([hash isEqualToString:self->_imageHash]) {
+        if ([self->_imageHash isEqualToString:hash]) {
             [self hideLoadingView];
             self.imageView.image = image;
         } else {
