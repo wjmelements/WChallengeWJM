@@ -68,13 +68,14 @@ static CGFloat kLabelPadding = 7.0f;
 }
 
 - (void)imageDidLoad:(UIImage *)image hash:(NSString *)hash {
-    if ([hash isEqualToString:self->_imageHash]) {
-        [self hideLoadingView];
-        self.imageView.image = image;
-    } else {
-        NSLog(@"Hash has changed:%@ -> %@", hash, self->_imageHash);
-    }
-
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([hash isEqualToString:self->_imageHash]) {
+            [self hideLoadingView];
+            self.imageView.image = image;
+        } else {
+            NSLog(@"Hash has changed:%@ -> %@", hash, self->_imageHash);
+        }
+    });
 }
 
 - (void)loadImage:(NSString *)remoteURL hash:(NSString *)hash {
@@ -86,16 +87,12 @@ static CGFloat kLabelPadding = 7.0f;
         if ([fileManager fileExistsAtPath:cachedFile]) {
             NSLog(@"Cached %@", remoteURL);
             UIImage *image = [UIImage imageWithContentsOfFile:cachedFile];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self imageDidLoad:image hash:hash];
-            });
+            [self imageDidLoad:image hash:hash];
         } else {
             NSLog(@"Fetching %@", remoteURL);
             NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:remoteURL]];
             UIImage *image = [UIImage imageWithData:data];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self imageDidLoad:image hash:hash];
-            });
+            [self imageDidLoad:image hash:hash];
             [data writeToFile:cachedFile atomically:NO];
         }
     });
